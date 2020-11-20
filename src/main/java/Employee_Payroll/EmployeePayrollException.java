@@ -3,7 +3,7 @@ package Employee_Payroll;
 public class EmployeePayrollException extends Exception {
 
 	enum ExceptionType {
-		DatabaseException, NoSuchClass
+		DatabaseException, NoSuchClass, ResourcesNotClosedException,  ConnectionFailed, CommitFailed
 	}
 
 	public ExceptionType type;

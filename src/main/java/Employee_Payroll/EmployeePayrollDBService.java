@@ -174,6 +174,7 @@ public class EmployeePayrollDBService {
 		EmployeePayrollData employeePayrollData = null;
 		try {
 			connection = this.getConnection();
+			connection.setAutoCommit(false);
 		} catch (SQLException sqlException) {
 			throw new EmployeePayrollException(sqlException.getMessage(),
 					EmployeePayrollException.ExceptionType.DatabaseException);
@@ -190,8 +191,12 @@ public class EmployeePayrollDBService {
 			}
 			employeePayrollData = new EmployeePayrollData(employeeID, name, salary, start);
 		} catch (SQLException e) {
-			throw new EmployeePayrollException(e.getMessage(),
-					EmployeePayrollException.ExceptionType.DatabaseException);
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				throw new EmployeePayrollException(e1.getMessage(),
+						EmployeePayrollException.ExceptionType.ConnectionFailed);
+			}
 		}
 		try (Statement statement = connection.createStatement()) {
 			double deductions = salary * 0.2;
@@ -206,8 +211,25 @@ public class EmployeePayrollDBService {
 				employeePayrollData = new EmployeePayrollData(employeeID, name, salary, start);
 			}
 		} catch (SQLException e) {
-			throw new EmployeePayrollException(e.getMessage(),
-					EmployeePayrollException.ExceptionType.DatabaseException);
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				throw new EmployeePayrollException(e1.getMessage(),
+						EmployeePayrollException.ExceptionType.ConnectionFailed);
+			}
+		}
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			throw new EmployeePayrollException(e.getMessage(), EmployeePayrollException.ExceptionType.CommitFailed);
+		} finally {
+			if (connection != null)
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					throw new EmployeePayrollException(e.getMessage(),
+							EmployeePayrollException.ExceptionType.ResourcesNotClosedException);
+				}
 		}
 		return employeePayrollData;
 	}
