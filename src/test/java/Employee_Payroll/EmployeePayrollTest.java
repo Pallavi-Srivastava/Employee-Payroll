@@ -68,12 +68,12 @@ public class EmployeePayrollTest {
 		boolean result = employeePayrollService.checkUpdatedRecordSyncWithDatabase("Allen");
 		Assert.assertTrue(result);
 	}
-	
+
 	@Test
 	public void givenEmployeePayroll_WhenAddNewColumn_ShouldSyncWithDB() throws EmployeePayrollException, SQLException {
 		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		employeePayrollService.addNewEmployeeToPayroll("Rosy", 7000000.00, LocalDate.now(), "F", "Sales");
+		employeePayrollService.addEmployeeToPayroll("Rosy", 7000000.00, LocalDate.now(), "F", "Sales");
 		boolean result = employeePayrollService.checkUpdatedRecordSyncWithDatabase("Rosy");
 		Assert.assertTrue(result);
-	}	
+	}
 }
